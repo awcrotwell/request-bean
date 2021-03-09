@@ -31,6 +31,9 @@ Layout/IndentationConsistency:
 Layout/LineLength:
   Max: 80
 
+Metrics/MethodLength:
+  Max: 15
+
 Metrics/BlockLength:
   Exclude:
     - "Guardfile"
