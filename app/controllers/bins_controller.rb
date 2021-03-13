@@ -10,7 +10,7 @@ class BinsController < ApplicationController
 
   # GET /bins/1 or /bins/1.json
   def show
-    pp @bin
+    byebug
     @requests = @bin.requests
   end
 
@@ -25,11 +25,12 @@ class BinsController < ApplicationController
   # POST /bins or /bins.json
   def create
     @bin = Bin.new(bin_params)
+    @bin.user = current_user
 
     respond_to do |format|
       if @bin.save
         format.html do
-          redirect_to @bin, notice: 'Bin was successfully created.'
+          redirect_to "/bins/#{@bin.url}", notice: 'Bin was successfully created.'
         end
         format.json { render :show, status: :created, location: @bin }
       else
