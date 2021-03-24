@@ -2,6 +2,7 @@
 
 class BinsController < ApplicationController
   before_action :set_bin, only: %i[show edit update destroy]
+  skip_before_action :verify_authenticity_token
 
   # GET /bins or /bins.json
   def index
@@ -10,7 +11,6 @@ class BinsController < ApplicationController
 
   # GET /bins/1 or /bins/1.json
   def show
-    pp @bin
     @requests = @bin.requests
   end
 
@@ -22,6 +22,18 @@ class BinsController < ApplicationController
   # GET /bins/1/edit
   def edit; end
 
+  # POST /bins/:bin
+  def new_request
+    # associate request with correct bin:
+    # get bin from db that has the bin url from this code: request.params["bin_url"]
+    # get the id of that bin
+    # save that id in the request object
+    @incoming_request = Request.new({payload: request.body, bin_url: request.params["bin_url"]})
+    pp @incoming_request
+
+    
+  end
+
   # POST /bins or /bins.json
   def create
     @bin = Bin.new(bin_params)
@@ -29,7 +41,7 @@ class BinsController < ApplicationController
     respond_to do |format|
       if @bin.save
         format.html do
-          redirect_to @bin, notice: 'Bin was successfully created.'
+          redirect_to "/bins/#{@bin.url}", notice: 'Bin was successfully created.'
         end
         format.json { render :show, status: :created, location: @bin }
       else
