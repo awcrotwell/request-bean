@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+  # frozen_string_literal: true
 
 class RequestsController < ApplicationController
   before_action :set_request, only: %i[show edit update destroy]
@@ -34,6 +34,8 @@ class RequestsController < ApplicationController
 
     respond_to do |format|
       if @incoming_request.save!
+        RequestForwardingJob.perform_later @incoming_request, bin.webhook_url
+
         ActionCable.server.broadcast(
           "request_channel_#{bin.url}", @incoming_request
         )
