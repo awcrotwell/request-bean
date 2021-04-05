@@ -34,12 +34,14 @@ class RequestsController < ApplicationController
 
     respond_to do |format|
       if @incoming_request.save!
-        RequestForwardingJob.perform_later @incoming_request, bin.webhook_url
+        if !@incoming_request.bin.webhook_url.blank? # TODO: clean up this logic a bit
+          RequestForwardingJob.perform_later @incoming_request, bin.webhook_url
+        end
 
         ActionCable.server.broadcast(
           "request_channel_#{bin.url}", @incoming_request
         )
-        # TODO: ActiveJobClassName.new(@incoming_request.id)
+
         format.json { render json: {}, status: :created }
       else
         format.json { render json: @bin.errors, status: :unprocessable_entity }
